@@ -1,0 +1,83 @@
+---Creating a table 
+
+CREATE Table appearances( 
+	player_id INTEGER, 
+	game_id INTEGER,
+	appearance_id VARCHAR,
+	competition_id VARCHAR,
+	player_club_id INTEGER,
+	goals VARCHAR,
+	assists VARCHAR,
+	minutes_played VARCHAR,
+	yellow_cards VARCHAR,
+	red_cards VARCHAR,
+	date VARCHAR,
+	player_pretty_name VARCHAR 
+) 
+
+---Changing the format to a coulmn
+
+ALTER TABLE  appearances 
+ALTER COLUMN goals TYPE INTEGER USING (goals::INTEGER)
+
+
+---Who has scored the most goals?
+
+SELECT player_pretty_name, SUM(goals) AS goals_scored
+FROM appearances 
+GROUP BY player_pretty_name 
+ORDER BY SUM(goals) DESC
+
+
+---Top 5 goal scores in the champions league?
+
+SELECT player_pretty_name, SUM(goals) AS goals_scored
+FROM appearances 
+Where competition_id = 'CL'
+GROUP BY player_pretty_name 
+ORDER BY SUM(goals) DESC
+LIMIT '5'
+
+
+---Top 5 Highest goal scores in 2023?
+
+SELECT player_pretty_name, SUM(goals) AS goals_scored
+FROM appearances
+where date  > '2022-01-01'
+GROUP BY player_pretty_name 
+ORDER BY SUM(goals) DESC
+
+
+---Highest goals and assists ratio 
+
+SELECT player_pretty_name, 
+(SUM(goals) + SUM(assists))/ COUNT(minutes_played)
+GROUP BY player_pretty_name 
+ORDER BY (SUM(goals) + SUM(assists))/ COUNT(minutes_played) DESC
+AS ga_ratio
+FROM appearances
+
+
+---Added the rest of the sheets into the database 
+
+CREATE TABLE clubs(
+    club_id INTEGER,
+	name VARCHAR,
+	pretty_name VARCHAR,
+	domestic_competition_id VARCHAR,
+	total_market_value INTEGER,
+	squad_size INTEGER,
+	average_age INTEGER,
+	foreigners_number INTEGER,
+	foreigners_percentage INTEGER,
+
+	national_team_players INTEGER,
+	stadium_name VARCHAR
+)
+
+---Joining two tables together 
+
+SELECT * FROM appearances
+INNER JOIN player
+ON appearances.player_id = player.player_id
+
